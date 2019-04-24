@@ -14,25 +14,26 @@ import javax.swing.JOptionPane;
 
 public class ListaTrabajadores implements Utilizable {
 	
-	List<Double> lista = new ArrayList<>();
+	List<String> lista = new ArrayList<>();
 
 	@Override
 	public String muestraTodos() {
-		return lista.stream().map(Objects::toString).collect(Collectors.joining(", "));
-	}
+        return String.join(", ", lista);
+    }
 
 	@Override
-	public void leeDeFichero(File nombreFichero) {
-		try {
-			DataInputStream i = new DataInputStream(new FileInputStream(nombreFichero.getPath()));
-			int byteRead;
-			while ((byteRead = i.read()) != -1) {
-				lista.add((double)byteRead);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public void leeDeFichero(File fichero) {
+        try {
+        	DataInputStream i = new DataInputStream(new FileInputStream(fichero.getPath()));
+        	String[] inputRead = i.readUTF().split("\n");
+        	for (String s : inputRead) {
+        		lista.add(s);
+        	}
+            i.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void guardaEnFichero(File nombreFichero) {
@@ -45,7 +46,7 @@ public class ListaTrabajadores implements Utilizable {
 
 	@Override
 	public void pideYAnyade() {
-		lista.add(Double.parseDouble(JOptionPane.showInputDialog(null, "¿Número a añadir?")));
+		lista.add(JOptionPane.showInputDialog(null, "¿Número a añadir?"));
 
 	}
 }
