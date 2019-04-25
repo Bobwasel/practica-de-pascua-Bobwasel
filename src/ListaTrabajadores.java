@@ -1,27 +1,36 @@
+import javax.swing.*;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-
 public class ListaTrabajadores implements Utilizable {
-	
-	List<String> lista = new ArrayList<>();
+	private String nombre;
+	private double sueldo;
+    List<String> lista = new ArrayList<>();
 
-	@Override
-	public String muestraTodos() {
-        return String.join(", ", lista);
+    public String muestraTodos() {
+    	int cont = 0;
+    	String salida = "";
+    	for (String s : lista ) {
+    		salida += s;
+    // salida += (cont++ % 2 == 0 ? ", " : "\n"); 
+    		if(cont % 2 == 0) {
+    			salida += ", ";
+    		} else {
+    			salida += "\n";
+    		}
+    		cont++;
+    	}
+        return salida;
     }
 
-	@Override
     public void leeDeFichero(File fichero) {
         try {
         	DataInputStream i = new DataInputStream(new FileInputStream(fichero.getPath()));
@@ -35,18 +44,26 @@ public class ListaTrabajadores implements Utilizable {
         }
     }
 
-	@Override
-	public void guardaEnFichero(File nombreFichero) {
-		try (PrintWriter out = new PrintWriter(nombreFichero)) {
-			out.print(lista.stream().map(Objects::toString).collect(Collectors.joining("\n")));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    public void guardaEnFichero(File fichero) {
+        try {
+			DataOutputStream o = new DataOutputStream(new FileOutputStream(fichero.getPath()));
+			o.writeUTF(lista.stream().collect(Collectors.joining("\n")));
+			o.close();
+        } catch (FileNotFoundException nfe) {
+            nfe.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Override
-	public void pideYAnyade() {
-		lista.add(JOptionPane.showInputDialog(null, "¿Número a añadir?"));
-
-	}
+    public void pideYAnyade() {
+    	try {
+			nombre = JOptionPane.showInputDialog(null, "¿Nombre?");
+			sueldo = Double.parseDouble(JOptionPane.showInputDialog(null, "¿Sueldo?"));
+			lista.add(nombre);
+			lista.add(Double.toString(sueldo));
+    	} catch (NumberFormatException nfe) {
+    		nfe.printStackTrace();
+    	}
+    }
 }
